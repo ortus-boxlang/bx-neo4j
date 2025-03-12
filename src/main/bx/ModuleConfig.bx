@@ -11,7 +11,6 @@
  *
  * Every module will have its own classloader that will be used to load the module libs and dependencies.
  */
-
 class {
 
 	property name="moduleRecord";
@@ -36,7 +35,7 @@ class {
 	 * The BoxLang mapping for your module.  All BoxLang modules are registered with an internal
 	 * mapping prefix of : bxModules.{this.mapping}, /bxmodules/{this.mapping}. Ex: bxModules.test, /bxmodules/test
 	 */
-	this.mapping = "bxSpreadsheet";
+	this.mapping = "neo4j";
 
 	/**
 	 * Who built the module
@@ -46,7 +45,7 @@ class {
 	/**
 	 * The module description
 	 */
-	this.description = "This module does amazing things";
+	this.description = "Neo4j driver";
 
 	/**
 	 * The module web URL
@@ -72,8 +71,6 @@ class {
 		 * Every module has a settings configuration object
 		 */
 		settings = {
-			loadedOn : now(),
-			loadedBy : "Luis Majano"
 		};
 
 		/**
@@ -101,17 +98,12 @@ class {
 		 * The module interceptors to register into the runtime
 		 */
 		interceptors = [
-			// { class="path.to.Interceptor", properties={} }
-			{ class : "#moduleRecord.invocationPath#.interceptors.Listener", properties : {
-				createdOn : now(),
-				by : "Luis Majano"
-			} }
 		];
 
 		/**
 		 * A list of custom interception points to register into the runtime
 		 */
-		customInterceptionPoints = [ "onBxTestModule" ];
+		customInterceptionPoints = [];
 	}
 
 	/**
@@ -136,7 +128,4 @@ class {
 	 * that match the approved runtime interception points
 	 */
 
-	 function afterModuleActivations(){
-		// do something
-	 }
 }
