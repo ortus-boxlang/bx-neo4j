@@ -41,7 +41,7 @@ public class Neo4jDriver extends GenericJDBCDriver {
 	 * https://cdn.oreillystatic.com/en/assets/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf
 	 */
 	protected static final IStruct				DEFAULT_HIKARI_PROPERTIES	= Struct.of(
-	   
+
 	);
 
 	/**

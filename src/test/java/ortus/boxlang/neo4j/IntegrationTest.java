@@ -36,7 +36,6 @@ public class IntegrationTest extends BaseIntegrationTest {
 		// Verify things got registered
 		assertThat( runtime.getDataSourceService().hasDriver( Key.of( "neo4j" ) ) ).isTrue();
 
-
 		// Register a named datasource
 		// runtime.getConfiguration().runtime.datasources.put(
 		// Key.of( "derby" ),
