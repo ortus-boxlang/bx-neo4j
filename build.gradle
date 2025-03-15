@@ -36,16 +36,16 @@ repositories {
 dependencies {
 	// Until BoxLang is published to Maven Central
 	// Look for it in the local build directory
-	// You must run `./gradle build -x test` in the BoxLang project
-	compileOnly files( '../../boxlang/build/distributions/boxlang-' + boxlangVersion + '.jar' )
-    compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
+	if ( file( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' ).exists() ) {
+		compileOnly files( '../../boxlang/build/libs/boxlang-' + boxlangVersion + '.jar' )
+		testImplementation files( '../../boxlang/build/distributions/boxlang-' + boxlangVersion + '.jar' )
+	} else {
+		compileOnly files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
+		testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
+	}
 
     // Neo4J
-    implementation 'org.neo4j:neo4j-jdbc-full-bundle:6.1.5'
-
-    // Testing Dependencies
-	testImplementation files( '../../boxlang/build/distributions/boxlang-' + boxlangVersion + '.jar' )
-	testImplementation files( 'src/test/resources/libs/boxlang-' + boxlangVersion + '.jar' )
+    implementation 'org.neo4j:neo4j-jdbc-full-bundle:6.2.0'
 
 	// Test Frameworks
 	testImplementation "org.junit.jupiter:junit-jupiter:5.+"
@@ -112,6 +112,7 @@ javadoc.finalizedBy( zipJavadocs )
  * This generates the META-INF/services files for the ServiceLoader as part of the `build` task
  */
 serviceLoader {
+	serviceInterface 'ortus.boxlang.runtime.jdbc.drivers.IJDBCDriver'
     serviceInterface 'ortus.boxlang.runtime.bifs.BIF'
     serviceInterface 'ortus.boxlang.runtime.components.Component'
     serviceInterface 'ortus.boxlang.runtime.async.tasks.IScheduler'

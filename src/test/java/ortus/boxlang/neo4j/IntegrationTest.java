@@ -14,11 +14,14 @@
  */
 package ortus.boxlang.neo4j;
 
-import ortus.boxlang.runtime.scopes.Key;
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import ortus.boxlang.runtime.config.segments.DatasourceConfig;
+import ortus.boxlang.runtime.scopes.Key;
+import ortus.boxlang.runtime.types.Struct;
 
 /**
  * This loads the module and runs an integration test on the module.
@@ -28,37 +31,34 @@ public class IntegrationTest extends BaseIntegrationTest {
 	@DisplayName( "Test the module loads in BoxLang" )
 	@Test
 	public void testModuleLoads() {
-		// Given
-
 		// Then
 		assertThat( moduleService.getRegistry().containsKey( moduleName ) ).isTrue();
-
 		// Verify things got registered
 		assertThat( runtime.getDataSourceService().hasDriver( Key.of( "neo4j" ) ) ).isTrue();
-
 		// Register a named datasource
-		// runtime.getConfiguration().runtime.datasources.put(
-		// Key.of( "derby" ),
-		// DatasourceConfig.fromStruct( Struct.of(
-		// "name", "derby",
-		// "driver", "derby",
-		// "properties", Struct.of(
-		// "database", "testDB",
-		// "protocol", "memory"
-		// )
-		// ) )
-		// );
+		runtime.getConfiguration().datasources.put(
+		    Key.of( "neo4j" ),
+		    new DatasourceConfig( moduleName ).process(
+		        Struct.of(
+		            "driver", "neo4j",
+		            "database", "neo4j",
+		            "username", "neo4j",
+		            "password", "boxlangRocks"
+		        )
+		    )
+		);
 
 		// @formatter:off
 		runtime.executeSource(
 		    """
-			// Testing code here
+				result = queryExecute(
+					"MATCH (n) RETURN n LIMIT 1",
+					{},
+					{ "datasource" : "neo4j" }
+				);
 			""",
 		    context
 		);
 		// @formatter:on
-
-		// Asserts here
-
 	}
 }

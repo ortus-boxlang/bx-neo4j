@@ -29,19 +29,20 @@ import ortus.boxlang.runtime.types.Struct;
 
 /**
  * The Neo4jDriver
- * https://github.com/neo4j/neo4j-jdbc
+ * https://neo4j.com/docs/jdbc-manual/current/configuration/
  */
 public class Neo4jDriver extends GenericJDBCDriver {
 
 	protected static final String				DEFAULT_PROTOCOL			= "";
-	protected static final Map<String, String>	AVAILABLE_PROTOCOLS			= Map.of();
+	protected static final Map<String, String>	AVAILABLE_PROTOCOLS			= Map.of( "bolt", "Bolt Protocol" );
+	protected static final String				DEFAULT_HOST				= "localhost";
+	protected static final String				DEFAULT_PORT				= "7687";
 
 	/**
 	 * Default Hikari Properties For Performance
 	 * https://cdn.oreillystatic.com/en/assets/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf
 	 */
 	protected static final IStruct				DEFAULT_HIKARI_PROPERTIES	= Struct.of(
-
 	);
 
 	/**
@@ -58,8 +59,12 @@ public class Neo4jDriver extends GenericJDBCDriver {
 		this.type					= DatabaseDriverType.OTHER;
 		this.driverClassName		= "org.neo4j.jdbc.Neo4jDriver";
 		this.defaultDelimiter		= "&";
-		this.defaultCustomParams	= Struct.of();
+		this.defaultCustomParams	= Struct.of(
+		    "enableSQLTranslation", "true",
+		    "debug", true
+		);
 		this.defaultProperties		= DEFAULT_HIKARI_PROPERTIES;
+		this.protocol				= DEFAULT_PROTOCOL;
 	}
 
 	@Override
@@ -67,21 +72,21 @@ public class Neo4jDriver extends GenericJDBCDriver {
 		// Validate the database
 		String database = ( String ) config.properties.getOrDefault( "database", "" );
 		if ( database.isEmpty() ) {
-			throw new IllegalArgumentException( "The database property is required for the MySQL JDBC Driver" );
+			throw new IllegalArgumentException( "The database property is required for the Neo4j JDBC Driver" );
 		}
 
 		// Validate the host
-		String host = ( String ) config.properties.getOrDefault( "host", "localhost" );
+		String host = ( String ) config.properties.getOrDefault( "host", DEFAULT_HOST );
 		if ( host.isEmpty() ) {
-			host = "localhost";
+			host = DEFAULT_HOST;
 		}
 
 		// Verify if we have a protocol
-		this.protocol = ( String ) config.properties.getOrDefault( "protocol", "" );
-		if ( protocol.length() > 0 && !AVAILABLE_PROTOCOLS.containsKey( protocol ) ) {
+		this.protocol = ( String ) config.properties.getOrDefault( "protocol", DEFAULT_PROTOCOL );
+		if ( !this.protocol.isEmpty() && !AVAILABLE_PROTOCOLS.containsKey( this.protocol ) ) {
 			throw new IllegalArgumentException(
 			    String.format(
-			        "The protocol '%s' is not valid for the MySQL Driver. Available protocols are %s",
+			        "The protocol '%s' is not valid for the Neo4j Driver. Available protocols are %s",
 			        this.protocol,
 			        AVAILABLE_PROTOCOLS.keySet().toString()
 			    )
@@ -89,14 +94,14 @@ public class Neo4jDriver extends GenericJDBCDriver {
 		}
 		// Append the : to the protocol if it exists
 
-		if ( protocol.length() > 0 ) {
+		if ( !protocol.isEmpty() ) {
 			protocol += ":";
 		}
 
 		// Port
-		String port = StringCaster.cast( config.properties.getOrDefault( "port", "7687" ) );
+		String port = StringCaster.cast( config.properties.getOrDefault( "port", DEFAULT_PORT ) );
 		if ( port.isEmpty() || port.equals( "0" ) ) {
-			port = "7687";
+			port = DEFAULT_PORT;
 		}
 
 		// Build the connection URL with no host info
