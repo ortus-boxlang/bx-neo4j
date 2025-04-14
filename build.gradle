@@ -45,7 +45,7 @@ dependencies {
 	}
 
     // Neo4J
-    implementation 'org.neo4j:neo4j-jdbc-full-bundle:6.2.0'
+    implementation 'org.neo4j:neo4j-jdbc-full-bundle:6.3.0'
 
 	// Test Frameworks
 	testImplementation "org.junit.jupiter:junit-jupiter:5.+"
