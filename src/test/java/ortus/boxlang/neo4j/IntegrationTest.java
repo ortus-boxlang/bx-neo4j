@@ -28,7 +28,7 @@ import ortus.boxlang.runtime.types.Struct;
  */
 public class IntegrationTest extends BaseIntegrationTest {
 
-	@DisplayName( "Test the module loads in BoxLang" )
+	@DisplayName( "Test module load and query execution" )
 	@Test
 	public void testModuleLoads() {
 		// Then
