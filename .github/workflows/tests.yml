@@ -11,9 +11,33 @@ env:
   MODULE_ID: ${{ github.event.repository.name }}
   GRADLE_VERSION: 8.7
 
+services:
+  neo4j:
+    image: neo4j:4.2.0-enterprise
+    env:
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_dbms_connector_bolt_enabled: "true"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_export_file_enabled: "true"
+      NEO4J_apoc_import_file_use__neo4j__config: "true"
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
+      NEO4J_dbms_security_auth__enabled: "false"
+      NEO4J_dbms_connector_bolt_advertised__address: localhost:7687
+      NEO4JLABS_PLUGINS: '["apoc"]'
+      NEO4J_AUTH: neo4j/boxlangRocks # Change password here (default: neo4j/password)
+      NEO4J_dbms_memory_heap_initial__size: 512m
+      NEO4J_dbms_memory_heap_max__size: 512m
+      NEO4J_dbms_memory_pagecache_size: 512m
+    options: >-
+      --health-cmd "cypher-shell 'match (n) return count(n)'"
+      --health-timeout 10s
+      --health-retries 20
+      --health-interval 10s
+      --health-start-period 30s
+    ports:
+      - 7687:7687
 jobs:
   tests:
-    name: Tests ${{ github.event.repository.name }}
     name: "OS: ${{ matrix.os }}, JDK: ${{ matrix.jdkVersion }}"
     runs-on: ${{ matrix.os }}
     env:
@@ -23,17 +47,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-latest", "windows-latest" ]
-        jdkVersion: [ "21" ]
+        os: ["ubuntu-latest", "windows-latest"]
+        jdkVersion: ["21"]
         experimental: [false]
         #include:
-          #- jdkVersion: "17"
-          #  os: "windows-latest"
-          #  experimental: true
-          # Disabled for now until we can figure out the gradle matrix
-          #- jdkVersion: "17"
-          #  os: "ubuntu-latest"
-          #  experimental: true
+        #- jdkVersion: "17"
+        #  os: "windows-latest"
+        #  experimental: true
+        # Disabled for now until we can figure out the gradle matrix
+        #- jdkVersion: "17"
+        #  os: "ubuntu-latest"
+        #  experimental: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
