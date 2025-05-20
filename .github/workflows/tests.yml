@@ -11,31 +11,6 @@ env:
   MODULE_ID: ${{ github.event.repository.name }}
   GRADLE_VERSION: 8.7
 
-services:
-  neo4j:
-    image: neo4j:4.2.0-enterprise
-    env:
-      NEO4J_dbms_security_procedures_unrestricted: apoc.*
-      NEO4J_dbms_connector_bolt_enabled: "true"
-      NEO4J_apoc_import_file_enabled: "true"
-      NEO4J_apoc_export_file_enabled: "true"
-      NEO4J_apoc_import_file_use__neo4j__config: "true"
-      NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
-      NEO4J_dbms_security_auth__enabled: "false"
-      NEO4J_dbms_connector_bolt_advertised__address: localhost:7687
-      NEO4JLABS_PLUGINS: '["apoc"]'
-      NEO4J_AUTH: neo4j/boxlangRocks # Change password here (default: neo4j/password)
-      NEO4J_dbms_memory_heap_initial__size: 512m
-      NEO4J_dbms_memory_heap_max__size: 512m
-      NEO4J_dbms_memory_pagecache_size: 512m
-    options: >-
-      --health-cmd "cypher-shell 'match (n) return count(n)'"
-      --health-timeout 10s
-      --health-retries 20
-      --health-interval 10s
-      --health-start-period 30s
-    ports:
-      - 7687:7687
 jobs:
   tests:
     name: "OS: ${{ matrix.os }}, JDK: ${{ matrix.jdkVersion }}"
@@ -123,6 +98,31 @@ jobs:
           SLACK_TITLE: "${{ env.MODULE_ID }} Build Failure"
           SLACK_USERNAME: CI
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+    services:
+      neo4j:
+        image: neo4j:4.2.0-enterprise
+        env:
+          NEO4J_dbms_security_procedures_unrestricted: apoc.*
+          NEO4J_dbms_connector_bolt_enabled: "true"
+          NEO4J_apoc_import_file_enabled: "true"
+          NEO4J_apoc_export_file_enabled: "true"
+          NEO4J_apoc_import_file_use__neo4j__config: "true"
+          NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
+          NEO4J_dbms_security_auth__enabled: "false"
+          NEO4J_dbms_connector_bolt_advertised__address: localhost:7687
+          NEO4JLABS_PLUGINS: '["apoc"]'
+          NEO4J_AUTH: neo4j/boxlangRocks # Change password here (default: neo4j/password)
+          NEO4J_dbms_memory_heap_initial__size: 512m
+          NEO4J_dbms_memory_heap_max__size: 512m
+          NEO4J_dbms_memory_pagecache_size: 512m
+        options: >-
+          --health-cmd "cypher-shell 'match (n) return count(n)'"
+          --health-timeout 10s
+          --health-retries 20
+          --health-interval 10s
+          --health-start-period 30s
+        ports:
+          - 7687:7687
 
   publish-test-results:
     name: Publish Test Results
